@@ -29,13 +29,13 @@ public class Bowling : MonoBehaviour
         }
         if (Keyboard.current.aKey.isPressed)
         {
-            //MoveLeft();
-            WalkLeft();
+            MoveLeft();
+            //WalkLeft();
         }
         if (Keyboard.current.dKey.isPressed)
         {
-            //MoveRight();
-            WalkRight();
+            MoveRight();
+            //WalkRight();
         }
         if (Keyboard.current.fKey.wasPressedThisFrame)
         {
@@ -52,7 +52,7 @@ public class Bowling : MonoBehaviour
 
     }
 
-    private void ShootBall()
+    public void ShootBall()
     {
         rb.AddForce(Vector3.forward*forcePower, ForceMode.Impulse);
     }
