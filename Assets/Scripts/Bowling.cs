@@ -10,6 +10,11 @@ public class Bowling : MonoBehaviour
     [SerializeField]
     private int forcePower;
 
+    public static int rounds = 0;
+    public static int scores = 0;
+
+    [SerializeField]
+    private GameObject counter;
 
 
     private bool fired = false;
@@ -17,7 +22,9 @@ public class Bowling : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+        LoadScore();
+        UIManager.instance.UpdateRound(rounds, scores);
+        Scanner.instance.PlacePin();
     }
 
     // Update is called once per frame
@@ -37,55 +44,57 @@ public class Bowling : MonoBehaviour
             MoveRight();
             //WalkRight();
         }
-        if (Keyboard.current.fKey.wasPressedThisFrame)
+        if (Keyboard.current.rKey.wasPressedThisFrame)
         {
-            ResetPos();
-        }
-        if (Keyboard.current.wKey.isPressed)
-        {
-            WalkForward();
-        }
-        if (Keyboard.current.sKey.isPressed)
-        {
-            WalkBackward();
+            RestartGame();
         }
 
     }
 
     public void ShootBall()
     {
+        if (fired)
+        { return;  }
+        fired = true;
         rb.AddForce(Vector3.forward*forcePower, ForceMode.Impulse);
     }
 
     private void MoveRight()
     {
-       transform.position += new Vector3(1f, 0f, 0f)*Time.deltaTime;
+        if (fired)
+        { return; }
+        transform.position += new Vector3(2f, 0f, 0f)*Time.deltaTime;
     }
 
     private void MoveLeft()
     {
-        transform.position += new Vector3(-1f, 0f, 0f) * Time.deltaTime;
+        if (fired)
+        { return; }
+        transform.position += new Vector3(-2f, 0f, 0f) * Time.deltaTime;
     }
 
-    private void ResetPos()
+    private void RestartGame()
     {
+        fired = false;
         transform.position = new Vector3(0, 1.25f, -9.21f);
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+        scores += 10-counter.gameObject.GetComponent<Scanner>().currentStanding;
+        rounds++;
+        SaveScore();
+        UIManager.instance.UpdateRound(rounds, scores);
+        Scanner.instance.PlacePin();
     }
 
-    private void WalkLeft()
+    private void LoadScore()
     {
-        rb.AddForce(-Vector3.right*0.5f, ForceMode.Impulse);
+        rounds = PlayerPrefs.GetInt("rounds", 0);
+        scores = PlayerPrefs.GetInt("scores", 0);
     }
-    private void WalkRight()
+
+    private void SaveScore()
     {
-        rb.AddForce(Vector3.right*0.5f, ForceMode.Impulse);
-    }
-    private void WalkForward()
-    {
-        rb.AddForce(Vector3.forward * 0.5f, ForceMode.Impulse);
-    }
-    private void WalkBackward()
-    {
-        rb.AddForce(-Vector3.forward * 0.5f, ForceMode.Impulse);
+        PlayerPrefs.SetInt("rounds", rounds);
+        PlayerPrefs.SetInt("scores", scores);
     }
 }
